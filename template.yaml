@@ -135,30 +135,30 @@ spec:
             EOF
 
 
-    - id: build_docker
-      name: Build and run docker containers
-      action: shell:run
-      input:
-        command: bash
-        args:
-          - -c
-          - |
-            echo "Running docker-compose with override..."
-            docker-compose -f "${{ parameters.Dockerfile }}" -f docker-compose.override.yml up --build -d
-    # Step 4: Build and run the container
-    - id: build_docker
-      name: Build and run docker containers
-      action: shell:run
-      input:
-        command: docker-compose
-        args:
-          - "-f"
-          - "${{ parameters.Dockerfile }}"
-          - "-f"
-          - "docker-compose.override.yml"
-          - "up"
-          - "--build"
-          - "-d"
+    # - id: build_docker
+    #   name: Build and run docker containers
+    #   action: shell:run
+    #   input:
+    #     command: bash
+    #     args:
+    #       - -c
+    #       - |
+    #         echo "Running docker-compose with override..."
+    #         docker-compose -f "${{ parameters.Dockerfile }}" -f docker-compose.override.yml up --build -d
+    # # Step 4: Build and run the container
+    # - id: build_docker
+    #   name: Build and run docker containers
+    #   action: shell:run
+    #   input:
+    #     command: docker-compose
+    #     args:
+    #       - "-f"
+    #       - "${{ parameters.Dockerfile }}"
+    #       - "-f"
+    #       - "docker-compose.override.yml"
+    #       - "up"
+    #       - "--build"
+    #       - "-d"
 
 
 
