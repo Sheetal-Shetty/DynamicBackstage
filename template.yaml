@@ -169,7 +169,8 @@ spec:
       input:
         cwd: ${{ steps.clone.output.path }}
         command: docker-compose
-        args: ["-f", "${{ parameters.extraFields.Dockerfile }}", "up", "--build"]
+        args: ["up", "--build"]
+        #args: ["-f", "${{ parameters.extraFields.Dockerfile }}", "up", "--build"]
         # args: ["build", "-f", "${{ parameters.extraFields.Dockerfile }}", "-t", "my-image:latest", "."]
 
 
