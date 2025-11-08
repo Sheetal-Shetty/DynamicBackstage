@@ -108,6 +108,20 @@ spec:
       input:
         url: ${{ parameters.Github_URL }}
         targetPath: .
+
+    - id: check_docker_access
+      name: Check Docker Access
+      action: shell:run
+      input:
+        command: bash
+        args:
+          - -c
+          - |
+            echo "Docker socket status:"
+            ls -l /var/run/docker.sock || echo "No socket found"
+            docker ps || echo "Cannot connect to Docker daemon"
+
+        
     
     - id: build_docker
       name: Build Docker Image (fallback)
