@@ -132,7 +132,18 @@ spec:
         args:
           - -c
           - |
-            DOCKER_HOST=unix:///var/run/docker.sock docker compose up --build
+            echo "🐳 Current dir: $(pwd)"
+            echo "📂 Listing files:"
+            ls -la
+            echo "⚙️ Starting docker compose build..."
+            DOCKER_HOST=unix:///var/run/docker.sock docker compose up --build 2>&1
+        echo "✅ Compose command finished (exit code $?)"
+        # cwd: ${{ steps.fetch-template.output.path }}
+        # command: bash
+        # args:
+        #   - -c
+        #   - |
+        #     DOCKER_HOST=unix:///var/run/docker.sock docker compose up --build
         # command: docker
         # args: ["compose", "up", "--build", "--no-color"]
         # command: bash
