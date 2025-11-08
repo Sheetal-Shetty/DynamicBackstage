@@ -110,7 +110,7 @@ spec:
         targetPath: .
     
     - id: build_docker
-      name: Build Docker Image
+      name: Build Docker Image5555555555
       if: ${{ parameters.stack == 'Docker' }}
       action: shell:run
       input:
