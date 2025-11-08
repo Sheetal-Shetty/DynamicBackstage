@@ -181,7 +181,7 @@ spec:
           
 
     - id: build_docker
-      name: Build Docker Image
+      name: Build Docker Image4444444
       if: ${{ parameters.stack == 'Docker' }}
       action: shell:run
       input:
