@@ -100,57 +100,97 @@ spec:
     #     targetPath: .
 
 
-
-    - id: fetch-template
-      name: Fetch template files
+    - id: fetch-repo
+      name: Clone GitHub repository
       if: ${{ parameters.stack == 'Docker' }}
-      action: fetch:template
+      action: shell:run
       input:
-        url: ${{ parameters.Github_URL }}
-        targetPath: .
-        values: {}
-        #targetPath: .
-        #cloneDirName: false 
+        command: bash
+        args:
+          - -c
+          - |
+            echo "Cloning repository..."
+            git clone "${{ parameters.Github_URL }}" repo
+            echo "Repo cloned:"
+            ls -la repo
 
     - id: debug_files
       name: Debug file listing
       if: ${{ parameters.stack == 'Docker' }}
       action: shell:run
       input:
-        cwd: ${{ steps.fetch-template.output.path }}
+        cwd: repo
         command: bash
         args:
           - -c
           - |
-            echo "PWD: $(pwd)"
-            echo "Listing files:"
+            pwd
             ls -la
-        
 
-    - id: check_docker_access
-      name: Check Docker Access
+    - id: build_docker
+      name: Build Docker Compose
       if: ${{ parameters.stack == 'Docker' }}
       action: shell:run
       input:
-        command: bash
-        args:
-          - -c
-          - |
-            echo "Docker socket status:"
-            ls -l /var/run/docker.sock || echo "No socket found"
-            docker ps || echo "Cannot connect to Docker daemon"
-
-    - id: build_docker2
-      name: Build Docker Image (fallback)
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        #cwd: ${{ steps.fetch-template.output.path }}
+        cwd: repo
         command: bash
         args:
           - -c
           - |
             docker compose -f "${{ parameters.extraFields.Dockerfile }}" up --build
+
+    
+        
+####################################################11-14-2025#####################################
+    # - id: fetch-template
+    #   name: Fetch template files
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: fetch:plain
+    #   input:
+    #     url: ${{ parameters.Github_URL }}
+    #     targetPath: .
+
+    # - id: debug_files
+    #   name: Debug file listing
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     cwd: ${{ steps.fetch-template.output.path }}
+    #     command: bash
+    #     args:
+    #       - -c
+    #       - |
+    #         echo "PWD: $(pwd)"
+    #         echo "Listing files:"
+    #         ls -la
+        
+
+    # - id: check_docker_access
+    #   name: Check Docker Access
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     command: bash
+    #     args:
+    #       - -c
+    #       - |
+    #         echo "Docker socket status:"
+    #         ls -l /var/run/docker.sock || echo "No socket found"
+    #         docker ps || echo "Cannot connect to Docker daemon"
+
+    # - id: build_docker2
+    #   name: Build Docker Image (fallback)
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     cwd: ${{ steps.fetch-template.output.path }}
+    #     command: bash
+    #     args:
+    #       - -c
+    #       - |
+    #         docker compose -f "${{ parameters.extraFields.Dockerfile }}" up --build
+
+#############################################################################################################################################
 
     - id: run_compose
       name: Run Docker Compose
