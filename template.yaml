@@ -124,7 +124,7 @@ spec:
       action: shell:run
       input:
         cwd: ${{ steps.fetch-repo.output.path }}
-        command: docker-compose
+        command: /usr/local/bin/docker-compose
         args: ["-f", "docker-compose.yml", "up", "--build", "-d"]
   
     # Step 4: Show running containers (optional)
