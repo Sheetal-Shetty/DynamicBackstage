@@ -1,0 +1,78 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: deploy-docker-compose
+  title: Deploy User Docker-Compose Repo
+  description: Deploys a user-provided GitHub repo containing a docker-compose.yml
+spec:
+  owner: user:guest
+  type: service
+
+  parameters:
+    - title: GitHub Repository URL
+      required:
+        - Github_URL
+      properties:
+        Github_URL:
+          title: Enter your GitHub URL
+          type: string
+          description: URL of the GitHub repo containing docker-compose.yml
+          ui:autofocus: true
+
+    - title: Deployment Name
+      required:
+        - DeploymentName
+      properties:
+        DeploymentName:
+          title: Deployment Name
+          type: string
+          description: A name for this deployment (used for folder and container names)
+
+steps:
+  # Step 1: Clone repo into a permanent folder
+  - id: fetch-repo
+    name: Clone GitHub Repository
+    action: shell:run
+    input:
+      command: sh
+      args:
+        - "-c"
+        - |
+          mkdir -p /opt/user-repos/${{ parameters.DeploymentName }}
+          git clone ${{ parameters.Github_URL }} /opt/user-repos/${{ parameters.DeploymentName }}
+
+  # Step 2: Validate docker-compose.yml exists
+  - id: validate-compose
+    name: Validate docker-compose.yml
+    action: shell:run
+    input:
+      command: sh
+      args:
+        - "-c"
+        - |
+          if [ ! -f /opt/user-repos/${{ parameters.DeploymentName }}/docker-compose.yml ]; then
+            echo "docker-compose.yml not found!"
+            exit 1
+          fi
+          docker-compose -f /opt/user-repos/${{ parameters.DeploymentName }}/docker-compose.yml config
+
+  # Step 3: Deploy docker-compose (detached)
+  - id: deploy-compose
+    name: Deploy Docker Compose
+    action: shell:run
+    input:
+      command: sh
+      args:
+        - "-c"
+        - |
+          cd /opt/user-repos/${{ parameters.DeploymentName }}
+          docker-compose up --build -d || \
+          (echo "Deployment failed, showing logs..." && docker-compose logs)
+
+  # Step 4: List running containers
+  - id: show-containers
+    name: List Running Containers
+    action: shell:run
+    input:
+      command: docker
+      args: ["ps"]
