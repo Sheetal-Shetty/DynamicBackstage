@@ -91,13 +91,30 @@ spec:
                   properties: {}
           
   steps:
-    # - id: fetch-template
-    #   name: Fetch template files
-    #   if: ${{ parameters.stack == 'Docker' }}
-    #   action: fetch:plain
-    #   input:
-    #     url: ${{ parameters.Github_URL }}
-    #     targetPath: .
+
+  
+    - id: fetch-template
+      name: Fetch template files
+      if: ${{ parameters.stack == 'Docker' }}
+      action: fetch:plain
+      input:
+        command: git
+        args: ["clone", "${{ parameters.Github_URL }}", "repo"]
+        cwd: .
+  
+    # Deploy using docker-compose
+    - id: deploy-docker
+      name: Deploy Docker Compose
+      if: ${{ parameters.stack == 'Docker' }}
+      action: shell:run
+      input:
+        cwd: ./repo
+        command: docker-compose
+        args: ["-f", "${{ parameters.extraFields.Dockerfile }}", "up", "--build", "--no-ansi", "-d"]
+
+      # input:
+      #   url: ${{ parameters.Github_URL }}
+      #   targetPath: .
 
     # - id: build_docker_compose33
     #   name: Build Docker Compose33
@@ -107,127 +124,129 @@ spec:
     #     cwd: ${{ steps.fetch-template.output.path }}
     #     command: docker-compose
     #     args: ["up", "--build"]
+#################################################################################111-14-2025###########################################
 
+    # - id: fetch-template
+    #   name: Fetch template files
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: fetch:plain
+    #   input:
+    #     url: ${{ parameters.Github_URL }}
+    #     targetPath: ./repo  # clone repo into ./repo
 
-    - id: fetch-template
-      name: Fetch template files
-      if: ${{ parameters.stack == 'Docker' }}
-      action: fetch:plain
-      input:
-        url: ${{ parameters.Github_URL }}
-        targetPath: ./repo  # clone repo into ./repo
-
-    - id: fetch-repo2222
-      name: Clone GitHub repository2222
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        command: bash
-        args:
-          - -c
-          - |
-            echo "Cloning repository..."
-            git clone "${{ parameters.Github_URL }}" repo
-            echo "Repo cloned:"
-            ls -la repo
+    # - id: fetch-repo2222
+    #   name: Clone GitHub repository2222
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     command: bash
+    #     args:
+    #       - -c
+    #       - |
+    #         echo "Cloning repository..."
+    #         git clone "${{ parameters.Github_URL }}" repo
+    #         echo "Repo cloned:"
+    #         ls -la repo
     
-    - id: debug_files
-      name: Debug file listing
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        cwd: ./repo
-        command: bash
-        args:
-          - -c
-          - |
-            echo "PWD: $(pwd)"
-            echo "Listing files:"
-            ls -la
+    # - id: debug_files
+    #   name: Debug file listing
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     cwd: ./repo
+    #     command: bash
+    #     args:
+    #       - -c
+    #       - |
+    #         echo "PWD: $(pwd)"
+    #         echo "Listing files:"
+    #         ls -la
     
-    - id: build_docker_compose2222
-      name: Build & Run Docker Compose2222
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        cwd: ./repo
-        command: docker
-        args:
-          - compose
-          - -f
-          - "${{ parameters.extraFields.Dockerfile }}"
-          - up
-          - --build
-          - -d
+    # - id: build_docker_compose2222
+    #   name: Build & Run Docker Compose2222
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     cwd: ./repo
+    #     command: docker
+    #     args:
+    #       - compose
+    #       - -f
+    #       - "${{ parameters.extraFields.Dockerfile }}"
+    #       - up
+    #       - --build
+    #       - -d
           
 
 
-    - id: check_compose_file
-      name: Check Compose File Exists
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        cwd: ./repo
-        command: bash
-        args:
-          - -c
-          - |
-            if [ ! -f "${{ parameters.extraFields.Dockerfile }}" ]; then
-              echo "❌ docker-compose.yml not found in repo root!"
-              exit 1
-            fi
+    # - id: check_compose_file
+    #   name: Check Compose File Exists
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     cwd: ./repo
+    #     command: bash
+    #     args:
+    #       - -c
+    #       - |
+    #         if [ ! -f "${{ parameters.extraFields.Dockerfile }}" ]; then
+    #           echo "❌ docker-compose.yml not found in repo root!"
+    #           exit 1
+    #         fi
 
     
             
     
-    - id: debug_files
-      name: Debug file listing
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        cwd: ${{ steps.fetch-template.output.path }}
-        command: ls
-        args:
-          - -la
+    # - id: debug_files
+    #   name: Debug file listing
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     cwd: ${{ steps.fetch-template.output.path }}
+    #     command: ls
+    #     args:
+    #       - -la
     
-    - id: check_docker_access
-      name: Check Docker Access
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        command: docker
-        args:
-          - ps
+    # - id: check_docker_access
+    #   name: Check Docker Access
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     command: docker
+    #     args:
+    #       - ps
     
-    - id: build_docker_compose
-      name: Build & Run Docker Compose
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        cwd: ${{ steps.fetch-template.output.path }}
-        command: docker
-        args:
-          - compose
-          - -f
-          - "${{ parameters.extraFields.Dockerfile }}"
-          - up
-          - --build
-          - -d
+    # - id: build_docker_compose
+    #   name: Build & Run Docker Compose
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     cwd: ${{ steps.fetch-template.output.path }}
+    #     command: docker
+    #     args:
+    #       - compose
+    #       - -f
+    #       - "${{ parameters.extraFields.Dockerfile }}"
+    #       - up
+    #       - --build
+    #       - -d
 
 
-    - id: fetch-repo
-      name: Clone GitHub repository
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        command: bash
-        args:
-          - -c
-          - |
-            echo "Cloning repository..."
-            git clone "${{ parameters.Github_URL }}" repo
-            echo "Repo cloned:"
-            ls -la repo
+    # - id: fetch-repo
+    #   name: Clone GitHub repository
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     command: bash
+    #     args:
+    #       - -c
+    #       - |
+    #         echo "Cloning repository..."
+    #         git clone "${{ parameters.Github_URL }}" repo
+    #         echo "Repo cloned:"
+    #         ls -la repo
+
+    #########################################################################1.07PM######################################
 
     # - id: debug_files
     #   name: Debug file listing
@@ -357,6 +376,8 @@ spec:
     #         docker compose -f "${{ parameters.extraFields.Dockerfile }}" up --build
 
 #############################################################################################################################################
+    
+
 
     - id: run_compose
       name: Run Docker Compose
