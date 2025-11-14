@@ -105,8 +105,8 @@ spec:
       action: shell:run
       input:
         cwd: ${{ steps.fetch-template.output.path }}
-        command: sudo
-        args: ["docker-compose", "up", "--build"]
+        command: docker-compose
+        args: ["up", "--build"]
 
 
     - id: fetch-repo
