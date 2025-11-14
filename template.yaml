@@ -107,7 +107,8 @@ spec:
       action: fetch:plain
       input:
         url: ${{ parameters.Github_URL }}
-        targetPath: .
+        targetPath: template
+        #targetPath: .
         #cloneDirName: false 
 
     - id: debug_files
