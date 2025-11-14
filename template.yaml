@@ -91,7 +91,7 @@ spec:
                   properties: {}
           
   steps:
-
+  
     - id: fetch-repo
       name: Clone GitHub Repository
       action: shell:run
@@ -100,8 +100,8 @@ spec:
         args:
           - "-c"
           - |
-            mkdir -p /opt/user-repos/temp_folder
-            git clone ${{ parameters.Github_URL }} /opt/user-repos/temp_folder
+            mkdir -p /opt/user-repos/${{ parameters.DeploymentName }}
+            git clone "${{ parameters.Github_URL }}" "/opt/user-repos/${{ parameters.DeploymentName }}"
   
     # Step 2: Validate docker-compose.yml exists
     - id: validate-compose
