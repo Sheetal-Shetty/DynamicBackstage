@@ -92,86 +92,134 @@ spec:
           
   steps:
 
-  
-    - id: fetch-template
-      name: Fetch template files
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        command: git
-        args: ["clone", "${{ parameters.Github_URL }}", "repo"]
-        cwd: .
-
     - id: fetch-repo
       name: Clone GitHub Repository
-      action: fetch:plain
-      input:
-        url: ${{ parameters.Github_URL }}
-        targetPath: .
-  
-    # Step 2: Validate docker-compose file
-    - id: validate-compose
-      name: Validate Docker Compose
       action: shell:run
       input:
-        cwd: ${{ steps.fetch-repo.output.path }}
-        command: /usr/local/bin/docker-compose
-        args: ["-f", "docker-compose.yml", "config"]
+        command: sh
+        args:
+          - "-c"
+          - |
+            mkdir -p /opt/user-repos/${{ parameters.DeploymentName }}
+            git clone ${{ parameters.Github_URL }} /opt/user-repos/${{ parameters.DeploymentName }}
+  
+    # Step 2: Validate docker-compose.yml exists
+    - id: validate-compose
+      name: Validate docker-compose.yml
+      action: shell:run
+      input:
+        command: sh
+        args:
+          - "-c"
+          - |
+            if [ ! -f /opt/user-repos/${{ parameters.DeploymentName }}/docker-compose.yml ]; then
+              echo "docker-compose.yml not found!"
+              exit 1
+            fi
+            docker-compose -f /opt/user-repos/${{ parameters.DeploymentName }}/docker-compose.yml config
   
     # Step 3: Deploy docker-compose (detached)
     - id: deploy-compose
       name: Deploy Docker Compose
       action: shell:run
       input:
-        cwd: ${{ steps.fetch-repo.output.path }}
-        command: /usr/local/bin/docker-compose
-        args: ["-f", "docker-compose.yml", "up", "--build", "-d"]
+        command: sh
+        args:
+          - "-c"
+          - |
+            cd /opt/user-repos/${{ parameters.DeploymentName }}
+            docker-compose up --build -d || \
+            (echo "Deployment failed, showing logs..." && docker-compose logs)
   
-    # Step 4: Show running containers (optional)
+    # Step 4: List running containers
     - id: show-containers
       name: List Running Containers
       action: shell:run
       input:
         command: docker
-        args: ["ps"]
+
+    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # - id: fetch-template
+    #   name: Fetch template files
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     command: git
+    #     args: ["clone", "${{ parameters.Github_URL }}", "repo"]
+    #     cwd: .
+
+    # - id: fetch-repo
+    #   name: Clone GitHub Repository
+    #   action: fetch:plain
+    #   input:
+    #     url: ${{ parameters.Github_URL }}
+    #     targetPath: .
+  
+    # # Step 2: Validate docker-compose file
+    # - id: validate-compose
+    #   name: Validate Docker Compose
+    #   action: shell:run
+    #   input:
+    #     cwd: ${{ steps.fetch-repo.output.path }}
+    #     command: /usr/local/bin/docker-compose
+    #     args: ["-f", "docker-compose.yml", "config"]
+  
+    # # Step 3: Deploy docker-compose (detached)
+    # - id: deploy-compose
+    #   name: Deploy Docker Compose
+    #   action: shell:run
+    #   input:
+    #     cwd: ${{ steps.fetch-repo.output.path }}
+    #     command: /usr/local/bin/docker-compose
+    #     args: ["-f", "docker-compose.yml", "up", "--build", "-d"]
+  
+    # # Step 4: Show running containers (optional)
+    # - id: show-containers
+    #   name: List Running Containers
+    #   action: shell:run
+    #   input:
+    #     command: docker
+    #     args: ["ps"]
 
       
   
-    # Deploy using docker-compose action: fetch:plain
+    # # Deploy using docker-compose action: fetch:plain
 
-    - id: check-docker-config
-      name: Check Docker Compose Config
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        cwd: ./repo
-        command: docker-compose
-        args: ["-f", "docker-compose.yml", "config"]
+    # - id: check-docker-config
+    #   name: Check Docker Compose Config
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     cwd: ./repo
+    #     command: docker-compose
+    #     args: ["-f", "docker-compose.yml", "config"]
     
-    - id: deploy-docker
-      name: Deploy Docker Compose
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        cwd: ./repo
-        command: docker-compose
-        args: ["-f", "docker-compose.yml", "up", "--build", "-d"]
+    # - id: deploy-docker
+    #   name: Deploy Docker Compose
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     cwd: ./repo
+    #     command: docker-compose
+    #     args: ["-f", "docker-compose.yml", "up", "--build", "-d"]
 
     
-    - id: deploy-docker
-      name: Deploy Docker Compose
-      if: ${{ parameters.stack == 'Docker' }}
-      action: shell:run
-      input:
-        cwd: ./repo
-        command: sh
-        args:
-          - "-c"
-          - |
-            echo "Checking docker-compose config..."
-            docker-compose -f docker-compose.yml config
-            echo "Attempting to start containers..."
-            docker-compose -f docker-compose.yml up --build
+    # - id: deploy-docker
+    #   name: Deploy Docker Compose
+    #   if: ${{ parameters.stack == 'Docker' }}
+    #   action: shell:run
+    #   input:
+    #     cwd: ./repo
+    #     command: sh
+    #     args:
+    #       - "-c"
+    #       - |
+    #         echo "Checking docker-compose config..."
+    #         docker-compose -f docker-compose.yml config
+    #         echo "Attempting to start containers..."
+    #         docker-compose -f docker-compose.yml up --build
+
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^            
         # command: docker-compose
         # args: ["-f", "${{ parameters.extraFields.Dockerfile }}", "up", "--build", "-d"]
         #, "--no-ansi", "-d"]
