@@ -101,6 +101,41 @@ spec:
         command: git
         args: ["clone", "${{ parameters.Github_URL }}", "repo"]
         cwd: .
+
+    - id: fetch-repo
+      name: Clone GitHub Repository
+      action: fetch:plain
+      input:
+        url: ${{ parameters.Github_URL }}
+        targetPath: .
+  
+    # Step 2: Validate docker-compose file
+    - id: validate-compose
+      name: Validate Docker Compose
+      action: shell:run
+      input:
+        cwd: ${{ steps.fetch-repo.output.path }}
+        command: docker-compose
+        args: ["-f", "${{ parameters.Dockerfile }}", "config"]
+  
+    # Step 3: Deploy docker-compose (detached)
+    - id: deploy-compose
+      name: Deploy Docker Compose
+      action: shell:run
+      input:
+        cwd: ${{ steps.fetch-repo.output.path }}
+        command: docker-compose
+        args: ["-f", "${{ parameters.Dockerfile }}", "up", "--build", "-d"]
+  
+    # Step 4: Show running containers (optional)
+    - id: show-containers
+      name: List Running Containers
+      action: shell:run
+      input:
+        command: docker
+        args: ["ps"]
+
+      
   
     # Deploy using docker-compose action: fetch:plain
 
