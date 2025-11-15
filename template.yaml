@@ -105,6 +105,18 @@ spec:
       input:
         composeFile: docker-compose.yml
 
+    - id: run-docker-compose
+      name: Run Docker Compose
+      action: shell:run
+      input:
+        cwd: ${{ steps.fetch-repo.output.path }}
+        command: /usr/local/bin/docker-compose
+        args:
+          - "-f"
+          - "docker-compose.yml"
+          - "up"
+          - "-d"
+
           
     # - id: fetch-repo
     #   name: Clone GitHub Repository
