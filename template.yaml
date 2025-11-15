@@ -99,11 +99,11 @@ spec:
         url: ${{ parameters.Github_URL }}
         targetPath: .
 
-    - id: deploy-compose
-      name: Deploy using Docker Compose
-      action: custom:run-docker-compose
-      input:
-        composeFile: docker-compose.yml
+    # - id: deploy-compose
+    #   name: Deploy using Docker Compose
+    #   action: custom:run-docker-compose
+    #   input:
+    #     composeFile: docker-compose.yml
 
     - id: run-docker-compose
       name: Run Docker Compose
