@@ -97,7 +97,7 @@ spec:
       action: fetch:plain
       input:
         url: ${{ parameters.Github_URL }}
-        targetPath: .
+        targetPath: ./
 
     - id: deploy-compose
       name: Deploy using Docker Compose
