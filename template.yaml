@@ -101,8 +101,8 @@ spec:
   output:
     links:
       - title: "Open Website deployed from Ansible"
-        if: ${{ parameters.stack == 'Docker' }}
-        url: "http://localhost:89"
+        if: ${{ parameters.stack == 'Baremetal' }}
+        url: "http://172.18.181.50"
         icon: "website"
 
 
