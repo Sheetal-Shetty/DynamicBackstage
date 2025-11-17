@@ -101,10 +101,11 @@ spec:
 
     - id: deploy-compose
       name: Deploy using Docker Compose
-      action: custom:run-docker-compose
+      action: custom:docker-compose
       input:
         composeFile: docker-compose.yml
         workDir: .
+      #action: custom:run-docker-compose
       # action: custom:docker-compose
       # input:
       #   composeFile: docker-compose.yml
