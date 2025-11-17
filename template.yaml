@@ -2,8 +2,8 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: Github-pages-deploy-from-github
-  title: Backstage Driven Internal Developer Platform
-  description: Automates website deployment.
+  title: Backstage Driven Internal Developer Platform - Dynamic
+  description: Automates dynamic website deployment using Docker containers and Ansible.
 spec:
   owner: user:guest
   type: service
