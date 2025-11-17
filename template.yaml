@@ -100,7 +100,7 @@ spec:
 
   output:
     links:
-      - title: "Open Website"
+      - title: "Open Website deployed from Ansible"
         if: ${{ parameters.stack == 'Docker' }}
         url: "http://localhost:89"
         icon: "website"
