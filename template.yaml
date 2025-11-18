@@ -49,12 +49,6 @@ spec:
                       type: string
                       description: Enter the Dockercompose file path (e.g. build/docker-compose.yml or enter docker-compose.yml if it is in root) 
                       default: "docker-compose.yml" 
-                    Port:
-                      title: Enter the Port number
-                      type: integer
-                      minimum: 1
-                      maximum: 65535
-                      description: Enter the Port number of your application (e.g. 80/3000/5000)
                        
             - properties:
                 stack:
