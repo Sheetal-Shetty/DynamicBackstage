@@ -101,7 +101,7 @@ spec:
       if: ${{ parameters.stack == 'Docker' }}
       action: shell:run
       input:
-        workingDirectory: ${{ workspace }}
+        workingDirectory: ${{ workspace }}/template
         command: bash
         args:
           - -c
